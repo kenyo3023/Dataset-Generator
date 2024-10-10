@@ -3,43 +3,44 @@ import json
 from enum import Enum
 from typing import Union
 
+from jinja2 import Template
+
 from utils.image_process import encode_image
 
 
-PROMPT_FOR_MULTITURN_QA_GENERATION = '''
+PROMPT_FOR_MULTITURN_QA_GENERATION = Template('''
 You are given an image and must generate a multi-turn QA session.
-The session should have a minimum of {min_turn} turns and a maximum of {max_turn} turns.
+The session should have a minimum of {{ min_turn }} turns and a maximum of {{ max_turn }} turns.
+{% if question_independent -%}
+Each question could be independent of the previous turn.
+{%- else -%}
 Each question should derive from the previous one, creating a coherent conversation.
+{%- endif %}
 
 1. Start by identifying an important feature in the image.
 2. Generate the first question based on that feature.
+{% if question_independent -%}
+3. For each subsequent turn, generate a question that could be independent of the previous turn.
+{% else -%}
 3. For each subsequent turn, generate a question that derives from the last question.
+{% endif -%}
 4. Provide an answer for each question.
 
 Format the output as follows:
-{{
+{
   "messages": [
-    {{
+    {
       "role": "user",
       "content": [Generated question based on the selected key point]
-    }},
-    {{
+    },
+    {
       "role": "assistant",
       "content": [Generated answer based on the image and key point]
-    }},
+    },
     ...
   ]
-}}
-'''.strip()
-
-
-class GenerateType(Enum):
-    """Enumerates the different generation types available for the BudgeRigar class."""
-
-    SINGLE_TURN = 'single-turn'
-    MULTI_TURN = 'multi-turn' # Each subsequent turn is dependent on each previous turn.
-    MULTI_INDEPENDENT_TURN = 'multi-indepedent-turn'
-    MIX = 'mix'
+}
+'''.strip())
 
 
 class BudgeRigar:
@@ -87,6 +88,7 @@ class BudgeRigar:
             image_path:str,
             min_turn:int=1,
             max_turn:int=3,
+            question_independent:bool=False,
         ):
         """Generates messages based on the provided image path and turn parameters.
 
@@ -94,6 +96,7 @@ class BudgeRigar:
             image_path (str): The file path to the image.
             min_turn (int): The minimum number of turns for generation. Default is 1.
             max_turn (int): The maximum number of turns for generation. Default is 3.
+            question_independent (bool): If True, each question may be independent of the previous questions. Default is False.
 
         Returns:
             list: The generated messages as a list.
@@ -112,9 +115,11 @@ class BudgeRigar:
                 "content": [
                     {
                         "type": "text",
-                        "text": PROMPT_FOR_MULTITURN_QA_GENERATION.format(
+                        # "text": PROMPT_FOR_MULTITURN_QA_GENERATION.format(
+                        "text": PROMPT_FOR_MULTITURN_QA_GENERATION.render(
                             min_turn=min_turn,
                             max_turn=max_turn,
+                            question_independent=question_independent,
                         ),
                     },
                     {
@@ -136,14 +141,14 @@ class BudgeRigar:
     def batch_generate(
         self,
         image_paths:str | list[str],
-        generate_type:Union[GenerateType, str]='mix',
         **kwargs,
     ):
         """Generates responses for multiple images based on the specified generation type.
 
+        This method handles a single image path or a list of image paths and generates responses for each.
+
         Args:
             image_paths (str | list[str]): A single image path or a list of image paths.
-            generate_type (Union[GenerateType, str]): The type of generation to perform. Default is 'mix'.
             **kwargs: Additional keyword arguments for the generate method.
 
         Returns:
@@ -155,24 +160,16 @@ class BudgeRigar:
         if isinstance(image_paths, str):
             image_paths = [image_paths]
 
-        if generate_type in [GenerateType.SINGLE_TURN, GenerateType.SINGLE_TURN.value]:
-            return [self.generate(image_path, min_turn=1, max_turn=1) for image_path in image_paths]
-        elif generate_type in [GenerateType.MULTI_TURN, GenerateType.MULTI_TURN.value]:
-            return [self.generate(image_path, **kwargs) for image_path in image_paths]
-        elif generate_type in [GenerateType.MULTI_INDEPENDENT_TURN, GenerateType.MULTI_INDEPENDENT_TURN.value]:
-            ... # TODO
-        elif generate_type in [GenerateType.MIX, GenerateType.MIX.value]:
-            ... # TODO
-        else:
-            raise ValueError(f'The given argument \'generate_type\' must be an element of [{[t.value for t in GenerateType]}]')
+        return [self.generate(image_path, **kwargs) for image_path in image_paths]
 
 
     def async_batch_generate(self):
         """Asynchronously generates responses for multiple images based on the specified generation type.
 
+        This method handles a single image path or a list of image paths and generates responses for each.
+
         Args:
             image_paths (str | list[str]): A single image path or a list of image paths.
-            generate_type (Union[GenerateType, str]): The type of generation to perform. Default is 'mix'.
             **kwargs: Additional keyword arguments for the generate method.
 
         Returns:
