@@ -7,12 +7,12 @@ from utils.image_process import encode_image
 class AsyncBudgeRigar(BudgeRigar):
 
     async def generate(
-            self,
-            image_path:str,
-            min_turn:int=1,
-            max_turn:int=3,
-            question_independent:bool=False,
-        ):
+        self,
+        image_path:str,
+        min_turn:int=1,
+        max_turn:int=3,
+        question_independent:bool=False,
+    ):
         """Asynchronously generates messages based on the provided image path and turn parameters.
 
         Args:
