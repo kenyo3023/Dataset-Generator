@@ -38,7 +38,6 @@ class AsyncBudgeRigar(BudgeRigar):
                 "content": [
                     {
                         "type": "text",
-                        # "text": PROMPT_FOR_MULTITURN_QA_GENERATION.format(
                         "text": PROMPT_FOR_MULTITURN_QA_GENERATION.render(
                             min_turn=min_turn,
                             max_turn=max_turn,
