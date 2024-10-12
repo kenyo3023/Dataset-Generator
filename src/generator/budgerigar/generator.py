@@ -161,21 +161,3 @@ class BudgeRigar:
             image_paths = [image_paths]
 
         return [self.generate(image_path, **kwargs) for image_path in image_paths]
-
-
-    def async_batch_generate(self):
-        """Asynchronously generates responses for multiple images based on the specified generation type.
-
-        This method handles a single image path or a list of image paths and generates responses for each.
-
-        Args:
-            image_paths (str | list[str]): A single image path or a list of image paths.
-            **kwargs: Additional keyword arguments for the generate method.
-
-        Returns:
-            list: A list of generated responses for each image.
-
-        Raises:
-            ValueError: If generate_type is not a valid element of GenerateType.
-        """
-        ... # TODO

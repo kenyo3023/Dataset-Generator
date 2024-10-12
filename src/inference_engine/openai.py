@@ -19,6 +19,10 @@ class OpenAIInferenceEngine:
         self.model = model
         self.chat_params = DEFAULT_CHAT_PARAMS
         self.chat_params.update(**chat_params)
+        self.setup_client()
+
+    def setup_client(self):
+        self.client = openai
 
     def update_chat_params(self, chat_params:dict):
         _chat_params = chat_params
@@ -37,7 +41,7 @@ class OpenAIInferenceEngine:
         messages = messages if isinstance(messages, list) else [{"role": "user", "content": messages}]
         chat_params = self.update_chat_params(chat_params)
 
-        response = openai.chat.completions.create(
+        response = self.client.chat.completions.create(
             messages=messages,
             model=model or self.model,
             **chat_params,
