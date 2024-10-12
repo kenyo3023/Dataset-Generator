@@ -83,14 +83,14 @@ class BudgeRigar:
             return None # TODO
 
 
-    def generate(
+    def _prepare_messages(
         self,
         image_path:str,
         min_turn:int=1,
         max_turn:int=3,
         question_independent:bool=False,
     ):
-        """Generates messages based on the provided image path and turn parameters.
+        """Prepares the messages for generating a multi-turn QA session.
 
         Args:
             image_path (str): The file path to the image.
@@ -99,10 +99,7 @@ class BudgeRigar:
             question_independent (bool): If True, each question may be independent of the previous questions. Default is False.
 
         Returns:
-            list: The generated messages as a list.
-        
-        Raises:
-            AssertionError: If min_turn is greater than max_turn.
+            list: A list of formatted message objects.
         """
         assert min_turn <= max_turn, \
             f'arg \'min_turn={min_turn}\' must smaller than \'max_turn={max_turn}\''
@@ -130,6 +127,28 @@ class BudgeRigar:
                 ],
             }
         ]
+        return messages
+
+
+    def generate(
+        self,
+        image_path:str,
+        **kwargs
+    ):
+        """Generates messages based on the provided image path and turn parameters.
+
+        Args:
+            image_path (str): The file path to the image.
+            **kwargs: Additional keyword arguments for message preparation
+                such as min_turn, max_turn, and question_independent.
+
+        Returns:
+            list: The generated messages as a list.
+
+        Raises:
+            AssertionError: If min_turn is greater than max_turn.
+        """
+        messages = self._prepare_messages(image_path, **kwargs)
 
         response = self.engine.chat_completions(messages)
         content = response.choices[0].message.content
