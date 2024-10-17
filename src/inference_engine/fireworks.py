@@ -1,5 +1,4 @@
 import os
-import asyncio
 from dotenv import load_dotenv
 from fireworks.client import Fireworks, AsyncFireworks
 from src.inference_engine.base import InferenceEngine, AsyncInferenceEngine
@@ -14,7 +13,7 @@ class FireWorksInferenceEngine(InferenceEngine):
     def setup_client(self):
         self.client = Fireworks(api_key=os.getenv("FIREWORKS_API_KEY"))
     
-class AsyncFireWorksInferenceEngine(InferenceEngine):
+class AsyncFireWorksInferenceEngine(AsyncInferenceEngine):
     def __init__(self, model: str, **chat_params):
         prefixed_model = f"accounts/fireworks/models/{model}"
         super().__init__(model=prefixed_model, **chat_params)

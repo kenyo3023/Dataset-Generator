@@ -1,6 +1,6 @@
 import os
-from openai import OpenAI, AsyncOpenAI
 from dotenv import load_dotenv
+from openai import OpenAI, AsyncOpenAI
 from src.inference_engine.base import InferenceEngine, AsyncInferenceEngine
 
 load_dotenv()

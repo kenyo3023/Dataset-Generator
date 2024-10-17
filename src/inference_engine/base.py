@@ -1,5 +1,6 @@
 import copy
 import asyncio
+from typing import Union, List, Dict
 from src.config.constants import DEFAULT_CHAT_PARAMS
 
 class InferenceEngine:
@@ -17,10 +18,10 @@ class InferenceEngine:
         _chat_params.update(chat_params)
         return _chat_params
 
-    def prepare_messages(self, messages: str | list[dict]):
+    def prepare_messages(self, messages: Union[str, List[Dict]]):
         return messages if isinstance(messages, list) else [{"role": "user", "content": messages}]
 
-    def chat_completions(self, messages: str | list[dict], model: str = None, **chat_params):
+    def chat_completions(self, messages: Union[str, List[Dict]], model: str = None, **chat_params):
         messages = self.prepare_messages(messages)
         chat_params = self.update_chat_params(chat_params)
 
@@ -34,7 +35,7 @@ class InferenceEngine:
 class AsyncInferenceEngine(InferenceEngine):
     async def batch_chat_completions(
         self,
-        batch_messages:list[list[dict]],
+        batch_messages:List[List[Dict]],
         **kwargs
     ):
         tasks = [self.chat_completions(messages, **kwargs) for messages in batch_messages]
