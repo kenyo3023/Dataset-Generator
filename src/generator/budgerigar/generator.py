@@ -2,9 +2,7 @@ import re
 import json
 from enum import Enum
 from typing import Union
-
 from jinja2 import Template
-
 from utils.image_process import encode_image
 
 
