@@ -1,7 +1,6 @@
 import asyncio
-
-from .generator import BudgeRigar, PROMPT_FOR_MULTITURN_QA_GENERATION
-from utils.image_process import encode_image
+from typing import Union, List
+from .generator import BudgeRigar
 
 
 class AsyncBudgeRigar(BudgeRigar):
@@ -34,7 +33,7 @@ class AsyncBudgeRigar(BudgeRigar):
 
     async def batch_generate(
         self,
-        image_paths:str | list[str],
+        image_paths:Union[str, List[str]],
         **kwargs,
     ):
         """Asynchronously generates responses for multiple images based on the specified generation type.
@@ -42,7 +41,7 @@ class AsyncBudgeRigar(BudgeRigar):
         This method handles a single image path or a list of image paths and generates responses for each.
 
         Args:
-            image_paths (str | list[str]): A single image path or a list of image paths.
+            image_paths (Union[str, List[str]]): A single image path or a list of image paths.
             **kwargs: Additional keyword arguments for the generate method.
 
         Returns:
