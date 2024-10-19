@@ -1,11 +1,8 @@
 import re
 import json
-from enum import Enum
-from typing import Union
-
+from typing import Union, List
 from jinja2 import Template
-
-from utils.image_process import encode_image
+from src.utils.image_process import encode_image
 
 
 PROMPT_FOR_MULTITURN_QA_GENERATION = Template('''
@@ -158,7 +155,7 @@ class BudgeRigar:
 
     def batch_generate(
         self,
-        image_paths:str | list[str],
+        image_paths:Union[str, List[str]],
         **kwargs,
     ):
         """Generates responses for multiple images based on the specified generation type.
@@ -166,7 +163,7 @@ class BudgeRigar:
         This method handles a single image path or a list of image paths and generates responses for each.
 
         Args:
-            image_paths (str | list[str]): A single image path or a list of image paths.
+            image_paths (Union[str, List[str]]): A single image path or a list of image paths.
             **kwargs: Additional keyword arguments for the generate method.
 
         Returns:

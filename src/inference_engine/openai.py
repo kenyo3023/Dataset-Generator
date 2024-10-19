@@ -1,49 +1,14 @@
 import os
-import copy
-import openai
 from dotenv import load_dotenv
+from openai import OpenAI, AsyncOpenAI
+from src.inference_engine.base import InferenceEngine, AsyncInferenceEngine
 
 load_dotenv()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-
-DEFAULT_CHAT_PARAMS = {
-    "max_tokens": 1024,
-    "temperature": 0.0,
-}
-
-class OpenAIInferenceEngine:
-
-    def __init__(self, model:str=None, **chat_params):
-        self.model = model
-        self.chat_params = DEFAULT_CHAT_PARAMS
-        self.chat_params.update(**chat_params)
-        self.setup_client()
-
+class OpenAIInferenceEngine(InferenceEngine):
     def setup_client(self):
-        self.client = openai
-
-    def update_chat_params(self, chat_params:dict):
-        _chat_params = chat_params
-        chat_params = copy.copy(self.chat_params)
-        chat_params.update(_chat_params)
-        return chat_params
-
-    def chat_completions(
-        self,
-        messages:str | list[dict],
-        model:str=None,
-        **chat_params:None
-    ):
-        assert model or self.model, "The model was neither specified nor initialized."
-
-        messages = messages if isinstance(messages, list) else [{"role": "user", "content": messages}]
-        chat_params = self.update_chat_params(chat_params)
-
-        response = self.client.chat.completions.create(
-            messages=messages,
-            model=model or self.model,
-            **chat_params,
-        )
-        return response
+        self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+    
+class AsyncOpenAIInferenceEngine(AsyncInferenceEngine):
+    def setup_client(self):
+        self.client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
